@@ -10,7 +10,16 @@ import type { FormItemProps } from "../utils/types";
 import type { PaginationProps } from "@pureadmin/table";
 import { getKeyList, deviceDetection } from "@pureadmin/utils";
 import { getRoleList, getRoleMenu, getRoleMenuIds } from "@/api/system";
-import { type Ref, reactive, ref, onMounted, h, toRaw, watch } from "vue";
+import {
+  type Ref,
+  reactive,
+  ref,
+  onMounted,
+  h,
+  toRaw,
+  watch,
+  computed
+} from "vue";
 
 export function useRole(treeRef: Ref) {
   const form = reactive({
@@ -42,21 +51,27 @@ export function useRole(treeRef: Ref) {
     currentPage: 1,
     background: true
   });
+  const { tagStyle } = usePublicHooks();
+
   const columns: TableColumnList = [
     {
-      label: "角色编号",
-      prop: "id"
+      label: "勾选列", // 如果需要表格多选，此处label必须设置
+      type: "selection",
+      fixed: "left",
+      reserveSelection: true // 数据刷新后保留选项
     },
     {
-      label: "角色名称",
-      prop: "name"
+      label: "ID",
+      prop: "id",
+      sortable: true
     },
     {
-      label: "角色标识",
-      prop: "code"
+      label: "Name",
+      prop: "name",
+      sortable: true
     },
     {
-      label: "状态",
+      label: "Tags",
       cellRenderer: scope => (
         <el-switch
           size={scope.props.size === "small" ? "small" : "default"}
@@ -74,21 +89,36 @@ export function useRole(treeRef: Ref) {
       minWidth: 90
     },
     {
-      label: "备注",
-      prop: "remark",
+      label: "Note",
+      prop: "note",
       minWidth: 160
     },
     {
-      label: "创建时间",
-      prop: "createTime",
+      label: "Proxy",
+      prop: "proxy",
+      minWidth: 160
+    },
+    {
+      label: "Updated at",
+      prop: "updateTime",
       minWidth: 160,
       formatter: ({ createTime }) =>
         dayjs(createTime).format("YYYY-MM-DD HH:mm:ss")
     },
     {
+      label: "Status",
+      prop: "status",
+      minWidth: 100,
+      cellRenderer: ({ row, props }) => (
+        <el-tag size={props.size} style={tagStyle.value(row.status)}>
+          {row.status === 1 ? "Ready" : "Not available"}
+        </el-tag>
+      )
+    },
+    {
       label: "操作",
       fixed: "right",
-      width: 210,
+      width: 180,
       slot: "operation"
     }
   ];
@@ -285,6 +315,16 @@ export function useRole(treeRef: Ref) {
       : treeRef.value.setCheckedKeys([]);
   });
 
+  const buttonClass = computed(() => {
+    return [
+      "!h-[20px]",
+      "reset-margin",
+      "!text-gray-500",
+      "dark:!text-white",
+      "dark:hover:!text-primary"
+    ];
+  });
+
   return {
     form,
     isShow,
@@ -300,6 +340,7 @@ export function useRole(treeRef: Ref) {
     isExpandAll,
     isSelectAll,
     treeSearchValue,
+    buttonClass,
     // buttonClass,
     onSearch,
     resetForm,

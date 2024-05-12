@@ -520,6 +520,7 @@ export function useUser(tableRef: Ref, treeRef: Ref) {
     onSearch,
     resetForm,
     onbatchDel,
+    
     openDialog,
     onTreeSelect,
     handleUpdate,

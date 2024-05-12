@@ -191,11 +191,25 @@ const values = ref<FieldValues>({});
 const handleOpen = () => {
   visible.value = true;
 };
+
+defineProps({
+  alwaysShow: {
+    type: Boolean,
+    default: true
+  }
+});
 </script>
 
 <template>
   <div>
     <el-button @click="handleOpen">打开弹窗表单</el-button>
+
+    <PlusDialogForm
+      v-model:visible="visible"
+      v-model="values"
+      :form="{ columns }"
+    />
+
     <PlusDialogForm
       v-model:visible="visible"
       v-model="values"
